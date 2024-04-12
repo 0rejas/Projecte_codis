@@ -1,0 +1,64 @@
+#!/bin/bash
+
+# Verificar si l'usuari actual te privilegis d'administrador
+if [ "$(id -u)" != "0" ]; then
+   echo "Aquest script ha de ser executat amb privilegis d'administrador" 1>&2
+   exit 1
+fi
+# Funció per verificar si la contrasenya compleix amb els requisits mínims
+password_valid() {
+    local password="$1"
+    local username="$2"
+    # Longitud mínima de la contrasenya
+    if [ ${#password} -lt 8 ]; then
+        echo "La contrasenya ha de tenir com a mínim 8 caracteres."
+        return 1
+    fi
+    # Verificar si la contrasenya conté al menys un número
+    if ! [[ "$password" =~ [0-9] ]]; then
+        echo "La contrasenya ha de tenir almenys un número."
+        return 1
+    fi
+    # Verificar si la contrasenya conte al menys una lletra en majúscula
+    if ! [[ "$password" =~ [A-Z] ]]; then
+        echo "La contrasenya ha de tenir almenys una lletra en majúscula."
+        return 1
+    fi
+    # Verificar si la contrasenya conte al menys una lletra en minúscula
+    if ! [[ "$password" =~ [a-z] ]]; then
+        echo "La contrasenya ha tenir almenys una lletra en minúscula."
+        return 1
+    fi
+    # Verificar si la contrasenya conte el nombre de l'usuari
+    if [[ "$password" == *"$username"* ]]; then
+        echo "La contrasenya no pot contenir el nom de l'usuari."
+        return 1
+    fi
+    return 0
+}
+# Arxiu que conté els noms d'usuari i contrasenyes
+input_file="usuaris.txt"
+# Verificar si l'arxiu d'entrada existeix
+if [ ! -f "$input_file" ]; then
+    echo "L'arxiu $input_file no existeix."
+    exit 1
+fi
+# Llegir l'arxiu d'entrada linia per linia
+while IFS= read -r line; do
+    username=$(echo "$line" | cut -d' ' -f1)
+    password=$(echo "$line" | cut -d' ' -f2)
+    # Verificar si l'usuari ja existeix
+    if id "$username" &>/dev/null; then
+        echo "L'usuari $username ja existeix, s'omet la seva creació."
+    else
+        # Verificar si la contrasenya compleix amb els requisits mínims
+        if password_valid "$password" "$username"; then
+            # Crear l'usuari amb la contrasenya especificada
+            useradd -m -s /bin/bash "$username"
+            echo "$username:$password" | chpasswd
+            echo "L'usuari $username ha sigut creat exitosament."
+        else
+            echo "L'usuari $username no ha pogut ser creat degut a que la contrasenya no compleix els requisits mínims."
+        fi
+    fi
+done < "$input_file"
