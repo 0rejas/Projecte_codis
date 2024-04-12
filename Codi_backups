@@ -1,0 +1,37 @@
+#!/bin/bash
+linias1=$(ls /mnt/FreefireBCKP |grep "docker" | wc -l)
+#guardem en unna variable la quantitat de backups de docker quen hi ha
+if [ $linias1 == 5 ];then
+#si la quantitat de backus the docker es igual a 5 es busca el backup mes
+#antic i hi s'elimina
+oldback=$(ls -t1 /mnt/FreefireBCKP | grep "docker" | tail -n 1)rm -f $oldback
+fi
+linias2=$(ls |grep "databases" | wc -l)
+#guardem en unna variable la quantitat de backups de BD quen hi ha
+if [ $linias2 == 5 ];then
+#si la quantitat de backus the BD es igual a 5 es busca el backup mes
+#antic hi s'elimina
+#antic hi s'elimina
+oldback2=$(ls -t1 | grep "databases" | tail -n 1)
+rm -f $oldback2
+fi
+#conexio ssh al seguent servidor
+ssh srv1@192.168.3.2 << EOF
+sudo -S su
+super3
+#entres en mode root
+cd /home
+#es fa un comprimit de la carpeta dockers hi s'envia al truenas amb la data
+tar -czvf docker.tar.gz /home/docker
+scp docker.tar.gz root@192.168.3.17:/mnt/FreefireBCKP/docker$(date +'%Y-%m-%d').tar.gz
+tar -czvf docker.tar.gz /home/docker
+#s'esborra el comprimit del servidor en el que s'a fet perque nomes estara
+#guardat en el nas
+rm -f docker.tar.gz
+cd /home/docker/dbBCKP
+#backup de totes les BD i s'envia al nas amb la data
+docker exec db mariadb-dump –user=ies –password=super3  –all-databases > ./databases.sql
+scp databases.sql root@192.168.3.17:/mnt/FreefireBCKP/databases$(date +’%Y-%m-%d’).sql
+rm databases.sql
+#s’sesborra el backup de la maquina en la que s’ha fet perque nomes es guardi en el nas
+EOF
