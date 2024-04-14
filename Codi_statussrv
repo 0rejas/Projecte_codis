@@ -1,0 +1,162 @@
+#!/bin/bash
+
+#Funció main on es troben totes les opcions.
+
+main () {
+
+        #Bucle while, mentre 'sortir' no canviï, no s'acaba. Per sortir s'ha d'apretar el 8.
+        while [[ $sortir != 'sortir' ]]
+
+        do
+
+                #Fem un if utilitzant la variable anterior 'connexio'.
+                if [ connexio != 'False' ];
+                then
+
+                        #Truquem la funcio 'menu'.
+                        menu
+
+                        #Preguntem a l'usuari que vol fer. 
+                        read -p "Que vols fer?:" option
+                        #Utilitzem un case per a presentar les opcions.
+                        case $option in
+
+
+                                #Obrim connexió ssh contra la mv. Utilitzant Here-docs veiem la informació del DNS.
+                                '1')
+
+                                        ssh srv1@192.168.3.2 <<- 'EOF'
+                                        sudo -S su
+                                        super3
+                                        docker ps | grep dns | awk '{print "\n \n El servidor DNS esta: " $7 " porta arrencat:  " $8" "$9}'
+                                        EOF
+
+                                ;;
+
+
+                                #Obrim connexió ssh contra la mv. Utilitzant Here-docs veiem la informació del DHCP.
+                                '2')
+
+                                        ssh srv1@192.168.3.2 <<- 'EOF'
+                                        sudo -S su
+                                        super3
+                                        docker ps | grep dhcp | awk '{print "\n \n El servidor DHCP esta: " $7 " porta arrencat:  " $8" "$9}'
+                                        EOF
+
+                                ;;
+
+
+
+                                #Obrim connexió ssh contra la mv. Utilitzant Here-docs veiem la informació de SAMBA.
+                                '3')
+
+                                        ssh freefire@192.168.3.12 <<- 'EOF'
+                                        sudo -S su
+                                        admin1234
+                                        systemctl status smbd.service | head -n3 | tail -n1
+                                        EOF
+
+                                ;;
+
+                               #Obrim connexió ssh contra la mv. Mostrem informació de LDAP.
+                                '4')
+                                        ssh freefire@192.168.3.12 <<- 'EOF'
+                                        sudo -S su
+                                        admin1234
+                                        systemctl status slapd.service | head -n5 | tail -n1
+                                        EOF
+                                ;;
+
+
+
+                                #Obrim connexió ssh contra la mv. Mostrem in formació de ASTERISK.
+                                '5')
+                                        ssh srv1@192.168.3.2 <<- 'EOF'
+                                        sudo -S su
+                                        super3
+                                        docker ps | grep asterisk | awk '{print "\n \n El servidor ASTERISK esta: " $7 " porta arrencat:  " $8" "$9}'
+                                        EOF
+                                ;;
+
+
+
+                                #Obrim connexió ssh contra la mv. Mostrem in formació de MARIADB.
+                                '6')
+                                      	ssh srv1@192.168.3.2 <<- 'EOF'
+                                        sudo -S su
+                                        super3
+                                        docker ps | grep mariadb | awk '{print "\n \n El servidor BBDD esta: " $7 " porta arrencat:  " $8" "$9}'
+                                        EOF
+                                ;;
+
+
+
+                                #Obrim connexió ssh contra la mv. Mostrem in formació de POSTFIX.
+                               '7')
+                                        ssh freefire@192.168.3.13 <<- 'EOF'
+                                        sudo -S su
+                                        super3
+                                        systemctl status postfix
+                                        EOF
+                                ;;
+
+                              #Obrim connexió ssh contra la mv. Mostrem in formació de OCSINVENTORY.
+                                '8')
+                                        ssh srv1@192.168.3.2 <<- 'EOF'
+                                        sudo -S su
+                                        super3
+                                        docker ps | grep ocsinventory | awk '{print "\n \n El servidor OCSINVENTORY esta: " $7 " porta arrencat:  " $8" "$9}'
+                                        EOF
+                                ;;
+
+
+
+                                #Obrim connexió ssh contra la mv. Mostrem in formació de ASTERISK.
+                                '9')
+
+                                        ssh srv1@192.168.3.2 <<- 'EOF'
+                                        sudo -S su
+                                        super3
+                                        docker ps | grep glpi | awk '{print "\n \n El servidor GLPI esta: " $7 " porta arrencat:  " $8" "$9}'
+                                        EOF
+                                ;;
+
+
+                                #Opció per a cambiar la vriable sortir i sortir del bucle.
+                                '10')
+
+                                        sortir="sortir"
+                                        echo "Sortint..."
+                                ;;
+
+                                *)
+                                        echo  "Aquesta opció no existeix. Torna a provar."
+                                ;;
+                        esac
+                        fi
+        done
+
+}
+
+#Funció menu que mostra les opcions que l'usuari pot escollir
+menu () {
+
+        echo "___________________"
+        echo "|1.DNS            |"
+        echo "|2.DHCP           |"
+        echo "|3.SAMBA          |"
+        echo "|4.LDAP           |"
+        echo "|5.ASTERISK       |"
+        echo "|6.BBDD           |"
+        echo "|7.CORREU         |"
+        echo "|8.OCSINVENTORRY  |"
+        echo "|9.GLPI           |"
+        echo "|10.Sortir        |"
+        echo "-------------------"
+
+}
+
+sortir=''
+
+#Les crides de les funcions
+main
