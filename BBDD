@@ -1,0 +1,60 @@
+use chatSBD;
+
+CREATE TABLE Treballadors (
+    ID INT PRIMARY KEY,
+    Nom VARCHAR(30),
+    Cognoms VARCHAR(50),
+    Residencia VARCHAR(40),
+    mail VARCHAR(60)
+);
+
+
+CREATE TABLE Ordinadors (
+    ID INT PRIMARY KEY,
+    SO VARCHAR(50),
+    RAM VARCHAR(50),
+    DISC VARCHAR(50),
+    CPU VARCHAR(50)
+);
+
+CREATE TABLE Utilitzar (
+    ID_utilizar INT PRIMARY KEY,
+    ID_Treballador INT,
+    ID_Ordinadors INT,
+    horario VARCHAR(20),
+    FOREIGN KEY (ID_Treballador) REFERENCES Treballadors(ID),
+    FOREIGN KEY (ID_Ordinadors) REFERENCES Ordinadors(ID)
+);
+CREATE TABLE Departaments (
+    ID INT PRIMARY KEY,
+    Nom VARCHAR(20),
+    VLAN INT,
+    IP Xarxa INT,
+    Mascara INT
+);
+CREATE TABLE Assignats (
+    ID_Assignacio INT PRIMARY KEY,
+    ID_Departaments INT,
+    ID_Ordinadors int,
+    FOREIGN KEY (ID_Departaments) REFERENCES Departaments(ID),
+    FOREIGN KEY (ID_Ordinadors) REFERENCES Ordinadors(ID)
+);
+CREATE TABLE Ubicacio (
+    ID_Ubicacio INT PRIMARY KEY,
+    ID_Departaments INT,
+    ID_Treballador INT,
+    FOREIGN KEY (ID_Departaments) REFERENCES Departaments(ID),
+    FOREIGN KEY (ID_Treballador) REFERENCES Treballadors(ID)
+);
+CREATE TABLE Telefons (
+    ID INT PRIMARY KEY,
+    IP_Xarxa INT,
+    Mascara INT
+);
+CREATE TABLE Ubicacio_Tel (
+    ID_UbTel int primary key,
+    ID_Departaments INT,
+    ID_Telefon INT,
+    FOREIGN KEY (ID_Departaments) REFERENCES Departaments(ID),
+    FOREIGN KEY (ID_Telefon) REFERENCES Telefons(ID)
+);
